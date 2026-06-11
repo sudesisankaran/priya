@@ -3,11 +3,11 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import './index.css';
 
 const STIMULI = [
-  { id: 'red-cube', name: 'Red Cube', className: 'shape-red-cube' },
-  { id: 'blue-sphere', name: 'Blue Sphere', className: 'shape-blue-sphere' },
-  { id: 'green-cube', name: 'Green Cube', className: 'shape-green-cube' },
-  { id: 'yellow-sphere', name: 'Yellow Sphere', className: 'shape-yellow-sphere' },
-  { id: 'purple-cube', name: 'Purple Cube', className: 'shape-purple-cube' }
+  { id: 'img-1', name: 'Shape 1', src: '/images/3d-shape-cylinder-mathematics-260nw-2081471311.webp' },
+  { id: 'img-2', name: 'Shape 2', src: '/images/abstract-3d-isometric-blockchain-cubic-background_1017-60787.avif' },
+  { id: 'img-3', name: 'Shape 3', src: '/images/abstract-vibrant-colorful-burst-design-with-central-light_9975-131509.avif' },
+  { id: 'img-4', name: 'Shape 4', src: '/images/images (1).png' },
+  { id: 'img-5', name: 'Shape 5', src: '/images/images.png' }
 ];
 
 const POSITIONS = ['Left', 'Center', 'Right'];
@@ -283,7 +283,11 @@ function App() {
 
         {appState === 'STIMULUS' && stimulusInfo && (
           <div className="w-full h-full bg-white relative">
-            <div className={`absolute shape ${stimulusInfo.className} ${getPositionClasses(stimulusInfo.position)} scale-50 md:scale-100`}></div>
+            <img 
+              src={stimulusInfo.src} 
+              alt={stimulusInfo.name} 
+              className={`absolute w-32 h-32 md:w-48 md:h-48 object-contain ${getPositionClasses(stimulusInfo.position)} scale-50 md:scale-100`} 
+            />
           </div>
         )}
 
