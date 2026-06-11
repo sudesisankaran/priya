@@ -3,7 +3,7 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import './index.css';
 
 const STIMULI = [
-  { id: 'img-1', name: 'Shape 1', src: '/images/3d-shape-cylinder-mathematics-260nw-2081471311.webp' },
+  { id: 'img-1', name: 'Shape 1', src: '/images/images.jpg' },
   { id: 'img-2', name: 'Shape 2', src: '/images/abstract-3d-isometric-blockchain-cubic-background_1017-60787.avif' },
   { id: 'img-3', name: 'Shape 3', src: '/images/abstract-vibrant-colorful-burst-design-with-central-light_9975-131509.avif' },
   { id: 'img-4', name: 'Shape 4', src: '/images/images (1).png' },
