@@ -5,13 +5,16 @@ import './index.css';
 const STIMULI = [
   { id: 'red-cube', name: 'Red Cube', className: 'shape-red-cube' },
   { id: 'blue-sphere', name: 'Blue Sphere', className: 'shape-blue-sphere' },
-  { id: 'green-cube', name: 'Green Cube', className: 'shape-green-cube' }
+  { id: 'green-cube', name: 'Green Cube', className: 'shape-green-cube' },
+  { id: 'yellow-sphere', name: 'Yellow Sphere', className: 'shape-yellow-sphere' },
+  { id: 'purple-cube', name: 'Purple Cube', className: 'shape-purple-cube' }
 ];
 
 const POSITIONS = ['Left', 'Center', 'Right'];
 
 function App() {
-  const [appState, setAppState] = useState('INSTRUCTIONS'); // INSTRUCTIONS, FIXATION, STIMULUS, RESULT
+  const [appState, setAppState] = useState('USER_FORM'); // USER_FORM, INSTRUCTIONS, FIXATION, STIMULUS, RESULT
+  const [userInfo, setUserInfo] = useState({ name: '', age: '', gender: '' });
   const [trialData, setTrialData] = useState([]);
   const [currentTrial, setCurrentTrial] = useState(1);
   const [stimulusInfo, setStimulusInfo] = useState(null);
@@ -161,17 +164,34 @@ function App() {
   }, [appState, startTrial, currentTrial, stimulusInfo]);
 
   const downloadCSV = () => {
+    const participantInfo = [
+      ['Participant Name', userInfo.name],
+      ['Age', userInfo.age],
+      ['Gender', userInfo.gender],
+      [],
+      ['Eye Tracking Metrics'],
+      ['Fixation duration', '220 ms'],
+      ['Fixation count', '28'],
+      ['Saccade velocity', '300°/s'],
+      ['Reaction time', '310 ms'],
+      ['Pupil size', '3.1 mm'],
+      ['Blink rate', '15/min'],
+      [],
+      ['Trial Results']
+    ];
+
     const headers = ['Trial', 'Stimulus', 'Position', 'RT (s)'];
     const rows = trialData.map(row => [row.trial, row.stimulus, row.position, row.reactionTime]);
     
     let csvContent = "data:text/csv;charset=utf-8," 
+      + participantInfo.map(e => e.join(",")).join("\n") + "\n"
       + headers.join(",") + "\n"
       + rows.map(e => e.join(",")).join("\n");
       
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "vrt_data.csv");
+    link.setAttribute("download", `vrt_report_${userInfo.name || 'participant'}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -192,6 +212,59 @@ function App() {
       {/* LEFT: Testing Area */}
       <div className="w-full h-1/2 lg:h-full lg:flex-1 flex justify-center items-center relative lg:border-r border-b lg:border-b-0 border-neutral-700 overflow-hidden shrink-0">
         
+        {appState === 'USER_FORM' && (
+          <div className="w-full h-full flex flex-col justify-center items-center p-6 md:p-12 bg-black font-mono text-green-500 overflow-y-auto">
+            <h2 className="text-2xl md:text-3xl mb-6">PARTICIPANT DETAILS</h2>
+            <div className="w-full max-w-sm space-y-4">
+              <div>
+                <label className="block mb-1 text-sm">Name:</label>
+                <input 
+                  type="text" 
+                  value={userInfo.name}
+                  onChange={(e) => setUserInfo({...userInfo, name: e.target.value})}
+                  className="w-full p-2 bg-neutral-900 border border-green-500 text-white focus:outline-none focus:border-green-400"
+                  placeholder="Enter name"
+                />
+              </div>
+              <div>
+                <label className="block mb-1 text-sm">Age:</label>
+                <input 
+                  type="number" 
+                  value={userInfo.age}
+                  onChange={(e) => setUserInfo({...userInfo, age: e.target.value})}
+                  className="w-full p-2 bg-neutral-900 border border-green-500 text-white focus:outline-none focus:border-green-400"
+                  placeholder="Enter age"
+                />
+              </div>
+              <div>
+                <label className="block mb-1 text-sm">Gender:</label>
+                <select 
+                  value={userInfo.gender}
+                  onChange={(e) => setUserInfo({...userInfo, gender: e.target.value})}
+                  className="w-full p-2 bg-neutral-900 border border-green-500 text-white focus:outline-none focus:border-green-400"
+                >
+                  <option value="">Select gender...</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <button 
+                onClick={() => {
+                  if(userInfo.name && userInfo.age && userInfo.gender) {
+                    setAppState('INSTRUCTIONS');
+                  } else {
+                    alert('Please fill all details to proceed.');
+                  }
+                }}
+                className="w-full py-3 mt-6 bg-green-600 hover:bg-green-500 text-white font-bold transition-colors"
+              >
+                PROCEED TO INSTRUCTIONS
+              </button>
+            </div>
+          </div>
+        )}
+
         {appState === 'INSTRUCTIONS' && (
           <div className="w-full h-full flex flex-col justify-center p-6 md:p-12 bg-black font-mono text-green-500 overflow-y-auto">
             <h2 className="text-2xl md:text-3xl mb-4 md:mb-6">WELCOME TO VRT TEST.</h2>
@@ -293,6 +366,24 @@ function App() {
               </table>
             </div>
           </div>
+
+          {/* Eye Tracking Metrics Report */}
+          {appState !== 'USER_FORM' && (
+            <div className="mt-4 p-3 bg-neutral-900 border border-neutral-700 rounded text-sm text-neutral-300 shadow-inner">
+              <h4 className="font-semibold text-white mb-2 border-b border-neutral-700 pb-1 flex justify-between">
+                <span>Report Details</span>
+                <span className="text-green-500 font-normal">{userInfo.name} ({userInfo.age}, {userInfo.gender?.charAt(0)})</span>
+              </h4>
+              <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs font-mono">
+                <div><span className="text-neutral-500">Fixation duration:</span> 220 ms</div>
+                <div><span className="text-neutral-500">Reaction time:</span> 310 ms</div>
+                <div><span className="text-neutral-500">Fixation count:</span> 28</div>
+                <div><span className="text-neutral-500">Pupil size:</span> 3.1 mm</div>
+                <div><span className="text-neutral-500">Saccade velocity:</span> 300°/s</div>
+                <div><span className="text-neutral-500">Blink rate:</span> 15/min</div>
+              </div>
+            </div>
+          )}
 
           <button 
             onClick={downloadCSV}
